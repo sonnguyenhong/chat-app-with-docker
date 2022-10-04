@@ -1,0 +1,45 @@
+type User {
+    id: Int
+    username: String!
+    email: String 
+    token: String
+    imageUrl: String 
+    createdAt: String
+    latestMessage: Message
+}
+
+type Message {
+    id: Int
+    content: String!
+    from: String!
+    to: String! 
+    createdAt: String
+    reactions: [Reaction]
+}
+
+type Reaction {
+    id: Int!
+    content: String!
+    createdAt: String!
+    message: Message
+    user: User
+}
+
+
+# ROOT TYPE
+type Query {
+    getUsers: [User]!
+    getMessages(from: String!): [Message]!
+}
+
+type Mutation {
+    register(username: String!, email: String!, password: String!, confirmPassword: String!): User!
+    login(username: String!, password: String!): User!
+    sendMessage(to: String!, content: String!): Message!
+    reactToMessage(messageId: Int!, content: String!): Reaction!
+}
+
+type Subscription {
+    newMessage: Message!
+    newReaction: Reaction!
+}
