@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  chat-app:
+    image: node:17
+    command: sh -c "npm install && npx prisma db push && npx prisma generate && npm start"
+    ports: 
+      - "4000:4000"
+    working_dir: /app
+    restart: "no"
+    depends_on:
+      - chat-app-db
+    volumes:
+      - ./chat-app:/app
+    environment:
+      MYSQL_HOST: chat-app-db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 123456
+      MYSQL_DB: chat-app
+
+
+  chat-app-client:
+    build: 
+      context: ./chat-app-client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    working_dir: /app
+    restart: always
+    volumes:
+      - ./chat-app-client:/app
+    environment:
+      REACT_APP_SERVER_URI: http://localhost:4000/graphql
+      REACT_APP_WS_URL: ws://localhost:4000/graphql
+    
+
+  chat-app-db:
+    image: mysql:8
+    container_name: chat-app-db
+    ports:
+      - "3307:3306"
+    volumes:
+      - todo-mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: chat-app
+
+volumes:
+  todo-mysql-data:
